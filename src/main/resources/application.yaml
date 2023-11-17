@@ -1,0 +1,82 @@
+server:
+  port: 10086
+
+spring:
+  application:
+    name: itemservice
+  main:
+    allow-bean-definition-overriding: true # 允许bean定义覆盖
+  shardingsphere:
+    datasource:
+      names: master,slave01,slave02
+      master:
+        type: com.alibaba.druid.pool.DruidDataSource
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        url: jdbc:mysql://127.0.0.1:4306/db_item?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+        username: root
+        password: 123456
+
+      slave01:
+          type: com.alibaba.druid.pool.DruidDataSource
+          driver-class-name: com.mysql.cj.jdbc.Driver
+          url: jdbc:mysql://127.0.0.1:4307/db_item?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+          username: root
+          password: 123456
+
+      slave02:
+          type: com.alibaba.druid.pool.DruidDataSource
+          driver-class-name: com.mysql.cj.jdbc.Driver
+          url: jdbc:mysql://127.0.0.1:4308/db_item?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+          username: root
+          password: 123456
+    masterslave:
+        load-balance-algorithm-type: round_robin
+        name: master-slave
+        master-data-source-name: master
+        slave-data-source-names: slave01,slave02
+    props:
+      sql:
+        show: true
+  redis:
+    password: redis
+#    sentinel:
+#      master: master
+#      password: redis
+#      nodes:
+#        - 192.168.43.33:26380
+#        - 192.168.43.33:26381
+#        - 192.168.43.33:26382
+    cluster:
+      nodes:
+        - 192.168.43.33:6380
+        - 192.168.43.33:6381
+        - 192.168.43.33:6382
+        - 192.168.43.33:6383
+        - 192.168.43.33:6384
+        - 192.168.43.33:6385
+
+mybatis-plus:
+  type-aliases-package: com.myhd.pojo
+  configuration:
+    map-underscore-to-camel-case: true
+  global-config:
+    db-config:
+      update-strategy: not_null
+      id-type: auto
+
+logging:
+  level:
+    io.lettuce.core: debug
+    top.javatool.canal: warn
+    web: info
+    root: info
+
+  pattern:
+    dateformat: MM-dd HH:mm:ss:SSS
+
+# canal配置
+canal:
+  destination: simple # 集群名称
+  server: 192.168.43.33:11111
+  user-name: canal
+  password: canal
